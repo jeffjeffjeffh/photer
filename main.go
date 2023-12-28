@@ -29,17 +29,33 @@ func handleResize(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 
-	log.Println("request content-type:", r.Header.Get("Content-Type"))
+	// file, _, err := r.FormFile("image")
+	// if err != nil {
+	// 	log.Fatal("Error getting image from form:", err)
+	// }
+	// defer file.Close()
+
+	// img, _, err := image.Decode(file)
+	// if err != nil {
+	// 	log.Fatal("Failed to decode the image:", err)
+	// }
+
+	// log.Println(img.Bounds())
+
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	file, _, err := r.FormFile("image")
 	if err != nil {
-		log.Fatal("Error getting image from form:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	defer file.Close()
 
 	img, _, err := image.Decode(file)
 	if err != nil {
-		log.Fatal("Failed to decode the image:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	log.Println(img.Bounds())
